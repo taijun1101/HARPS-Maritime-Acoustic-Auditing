@@ -9,6 +9,8 @@ ROOT = Path(__file__).resolve().parents[1]
 class SmokeTests(unittest.TestCase):
     def test_runner_parses(self):
         ast.parse((ROOT / 'run_experiments.py').read_text(encoding='utf-8'))
+        for file in (ROOT / 'harps').glob('*.py'):
+            ast.parse(file.read_text(encoding='utf-8'))
 
 
     def test_downloaders_parse(self):
