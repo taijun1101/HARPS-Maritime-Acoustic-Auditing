@@ -1,0 +1,17 @@
+# Primary experiment dependencies, pinned to the supplied Linux server environment.
+# For a complete environment snapshot see environment/pip_freeze.txt.
+# CUDA PyTorch wheel installation may require the PyTorch cu121 index (README).
+torch==2.5.1+cu121
+torchaudio==2.5.1+cu121
+torchvision==0.20.1+cu121
+transformers==4.46.3
+huggingface-hub==0.26.2
+numpy==1.26.4
+pandas==2.2.3
+scipy==1.13.1
+scikit-learn==1.5.2
+librosa==0.11.0
+soundfile==0.14.0
+pyod==3.6.6
+joblib==1.6.0
+safetensors==0.4.5
