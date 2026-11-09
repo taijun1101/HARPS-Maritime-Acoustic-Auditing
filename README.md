@@ -4,8 +4,6 @@ Official research implementation of **HARPS: Asymmetric Reference Learning for N
 
 This repository provides the modular Python implementation, experiment configurations, baseline methods, evaluation procedures, and supporting utilities for reproducing the HARPS experiments.
 
-The implementation has been validated against the original research code through complete experimental execution and numerical equivalence testing.
-
 ## 1. Overview
 
 HARPS is a noise-aware, one-class anomaly detection framework for underwater maritime acoustic monitoring.
