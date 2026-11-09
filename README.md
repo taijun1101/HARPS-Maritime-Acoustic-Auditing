@@ -251,28 +251,39 @@ For each held-out acoustic class:
 4. The complete dataset is evaluated, including both reference-class and held-out-class samples.
 5. The procedure is repeated across all 12 acoustic classes.
 
+
 Let the dataset be
 
 $$
-\mathcal{D} = \{(x_i, y_i)\}_{i=1}^{N}.
+\mathcal{D} = \left\{(x_i, y_i)\right\}_{i=1}^{N}.
 $$
 
 For a held-out class $c$, define the normal reference set as
 
 $$
-\mathcal{D}_{\mathrm{ref}}^{(c)} = {x_i \mid y_i \neq c},
+\mathcal{D}_{\mathrm{ref}}^{(c)}
+=
+\left\{x_i \mid y_i \neq c\right\},
 $$
 
 and the anomaly set as
 
-$$\mathcal{D}_{\mathrm{anom}}^{(c)} = {x_i \mid y_i = c}.
+$$
+\mathcal{D}_{\mathrm{anom}}^{(c)}
+=
+\left\{x_i \mid y_i = c\right\}.
 $$
 
 The evaluation dataset is
 
 $$
-\mathcal{D}_{\mathrm{eval}}^{(c)} = \mathcal{D}_{\mathrm{ref}}^{(c)}\cup\mathcal{D}_{\mathrm{anom}}^{(c)}.
+\mathcal{D}_{\mathrm{eval}}^{(c)}
+=
+\mathcal{D}_{\mathrm{ref}}^{(c)}
+\cup
+\mathcal{D}_{\mathrm{anom}}^{(c)}.
 $$
+
 
 This protocol does **not** use an 80/20 train-test split.
 
