@@ -260,12 +260,12 @@ $$
 For a held-out class $c$, define the normal reference set as
 
 $$
-\mathcal{D}_{\mathrm{ref}}^{(c)} = \{x_i \mid y_i \neq c\},
+\mathcal{D}_{\mathrm{ref}}^{(c)} = {x_i \mid y_i \neq c},
 $$
 
 and the anomaly set as
 
-$$\mathcal{D}_{\mathrm{anom}}^{(c)} = \{x_i \mid y_i = c\}.
+$$\mathcal{D}_{\mathrm{anom}}^{(c)} = {x_i \mid y_i = c}.
 $$
 
 The evaluation dataset is
