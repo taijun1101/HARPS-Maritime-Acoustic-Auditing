@@ -99,7 +99,8 @@ def summarize_results(df: pd.DataFrame, output_dir: Path, bootstrap_repeats: int
     overall.to_csv(output_dir / "overall_metrics_across_loco.csv",index=False,)
     if "sensitivity_parameter" not in df.columns:
         summarize_uncertainty(df, output_dir, bootstrap_repeats)
-        summarize_wilcoxon(df, output_dir)
+        if ("method" in df.columns and (df["method"] == "deep_svdd").any()):
+            summarize_wilcoxon(df, output_dir)
 
 
 # [NEW - R2-4] Class-cluster bootstrap and seed-level variability.
