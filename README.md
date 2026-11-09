@@ -47,23 +47,20 @@ HARPS-Maritime-Acoustic-Auditing/
 │   ├── check_dataset.py
 │   ├── check_environment.py
 │   └── run_full_experiments.sh
-├── reference/
-│   └── original_run_experiments.py
-├── tests/
 ├── environment/
 │   ├── environment.json
 │   ├── pip_freeze.txt
 │   └── conda_explicit.txt
+├── .gitignore
 ├── requirements.txt
 ├── LICENSE-NOTICE.md
 └── README.md
+
 ```
 
 The main experimental implementation is contained in the `harps/` package.
 
 The `scripts/` directory provides utilities for downloading research resources, checking the environment, and executing experiments.
-
-The `reference/` and `tests/` directories are primarily intended for development, regression testing, and maintenance. They are not required for normal experiment execution.
 
 ## 3. Environment and Installation
 
@@ -139,7 +136,7 @@ This utility compares the installed environment against the recorded experimenta
 
 The experiments use the ShipsEar underwater acoustic dataset.
 
-The experiment-ready dataset contains:
+The dataset used in the HARPS experiments has the following characteristics:
 
 | Property | Value |
 |---|---|
@@ -150,7 +147,7 @@ The experiment-ready dataset contains:
 | Sampling rate | 16,000 Hz |
 | Experimental protocol | Reference-inclusive LOCO |
 
-The dataset can be downloaded using the provided utility:
+Download and extract the dataset using:
 
 ```bash
 python scripts/download_shipsear.py \
@@ -158,41 +155,38 @@ python scripts/download_shipsear.py \
   --extract
 ```
 
-Source dataset:
+Dataset source: [ShipsEar / DS3500 on Hugging Face](https://huggingface.co/datasets/peng7554/DS3500)
 
-[ShipsEar / DS3500 on Hugging Face](https://huggingface.co/datasets/peng7554/DS3500)
-
-**Important:** The downloaded `ShipsEar.zip` is not automatically equivalent to the experiment-ready `shipsear_5s_16k` dataset.
-
-The download utility does not perform audio segmentation, resampling, or experimental preprocessing.
-
-The experiment runner expects the following directory structure:
+After extraction, the experiment-ready dataset is located at:
 
 ```text
-shipsear_5s_16k/
-├── group_1/
-│   ├── class_1/
-│   │   ├── segment_001.wav
-│   │   └── segment_002.wav
-│   └── class_2/
-│       └── ...
-└── group_2/
-    └── ...
+data/DS3500/ShipsEar/shipsear_5s_16k/
+├── 0/
+├── 1/
+├── 2/
+├── 3/
+├── 4/
+├── label_list.txt
+├── train_list.txt
+├── test_list.txt
+└── ...
 ```
+The ShipsEar dataset follows a two-level directory structure. The five top-level directories (`0`–`4`) contain subdirectories corresponding to acoustic categories.
 
-The directory names above are illustrative. The experiment runner reads WAV files recursively and derives acoustic class labels from the second directory component relative to `data_root`.
+Each acoustic class is identified by combining the two directory levels. For example, audio files under `0/0/` are assigned to class `0_0`.
 
-Ensure that the prepared dataset uses the same audio segmentation, sampling rate, class assignments, and file organization as the original experiment.
+The HARPS experiments use 12 distinct acoustic classes defined by these directory combinations.
 
-A verified end-to-end preprocessing utility for transforming the downloaded archive into the exact experiment-ready dataset is not currently included in this repository.
+The dataset can be used directly after extraction without additional audio segmentation or resampling.
 
-Verify the prepared dataset structure using:
+Verify the dataset directory using:
 
 ```bash
 python scripts/check_dataset.py \
-  --data_root /path/to/shipsear_5s_16k
+  --data_root ./data/DS3500/ShipsEar/shipsear_5s_16k
 ```
 
+Use this same directory as the `--data_root` argument when executing `run_experiments.py`.
 ### 4.2 Pretrained Audio Spectrogram Transformer
 
 HARPS uses a pretrained Audio Spectrogram Transformer (AST).
@@ -291,11 +285,13 @@ The evaluation configurations include:
 - Pink noise.
 - Multiple signal-to-noise ratios.
 
+
 The default noisy evaluation SNRs are:
 
-\[
-\mathrm{SNR}\in\{20,10,5\}\ \mathrm{dB}.
-\]
+$$
+\mathrm{SNR} \in \lbrace 20, 10, 5 \rbrace\ \mathrm{dB}.
+$$
+
 
 Noise-related experiments examine the effects of acoustic corruption on anomaly ranking, representation consistency, and model robustness.
 
@@ -319,7 +315,7 @@ Execute the following command from the repository root:
 
 ```bash
 python run_experiments.py \
-  --data_root /path/to/shipsear_5s_16k \
+  --data_root ./data/DS3500/ShipsEar/shipsear_5s_16k \
   --ast_model_path ./ast_weight \
   --output_dir ./results \
   --run_all \
@@ -375,7 +371,7 @@ The repository also provides a shell script for executing the full experiment.
 Configure the required environment variables:
 
 ```bash
-export HARPS_DATA_ROOT="/path/to/shipsear_5s_16k"
+export HARPS_DATA_ROOT="./data/DS3500/ShipsEar/shipsear_5s_16k"
 
 export HARPS_AST_PATH="./ast_weight"
 
@@ -394,7 +390,7 @@ The shell script is intended for compatible Linux/CUDA environments.
 
 For independent reproduction:
 
-- Use the experiment-ready ShipsEar dataset with matching audio segments and labels.
+- Use the ShipsEar dataset downloaded and extracted from the specified Hugging Face repository.
 - Use the same pretrained AST checkpoint and software dependencies.
 - Preserve the experimental random seeds and evaluation conditions.
 - Use a fresh output directory to avoid unintended reuse of cached results.
@@ -460,26 +456,7 @@ The Wilcoxon analysis compares selected Deep SVDD training configurations using 
 
 It does not automatically provide statistical comparisons between HARPS and every baseline method.
 
-## 8. Validation and Testing
-
-The modular HARPS implementation has been validated against the preserved original research implementation through complete experimental runs.
-
-Model artifacts, numerical outputs, evaluation metrics, and supported statistical summaries were compared to establish implementation equivalence under the tested configuration.
-
-These developer-side equivalence checks are not required for normal use of the repository.
-
-Users may optionally perform syntax checks and run the included unit tests:
-
-```bash
-python -m compileall -q \
-  harps scripts tests run_experiments.py
-
-python -m unittest discover -s tests -v
-```
-
-The unit tests are intended to detect software regressions. They do not replace full experimental reproduction.
-
-## 9. Citation
+## 8. Citation
 
 If you use HARPS or its implementation in your research, please cite:
 
@@ -496,7 +473,7 @@ If you use HARPS or its implementation in your research, please cite:
 
 The citation will be updated when the final publication metadata, including DOI and page numbers, becomes available.
 
-## 10. License and Attribution
+## 9. License and Attribution
 
 This repository does not redistribute ShipsEar audio data or pretrained AST model weights.
 
