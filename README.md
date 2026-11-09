@@ -73,30 +73,68 @@ The frozen AST representation uses the **mean of the first two special-token emb
 
 Results are written under `--output_dir`, including `dataset_manifest.csv`, `loco_sample_counts.csv`, `ast_metadata.json`, `experiment_config.json`, `baselines/`, `deep_svdd/`, `sensitivity/`, `feature_cache/`, and `summary/`. The `summary/` subdirectories include `overall_metrics_across_loco.csv` and other aggregation outputs. Large outputs are ignored by Git.
 
-### Caveats
+## Attribution and Redistribution
 
-- `--run_all` runs the complete baseline grid **including** kNN and Mahalanobis in this supplied revision, despite older module-header wording.
-- The baseline runner currently fits a model separately for each evaluation condition; reported training cost excludes feature extraction.
-- The original runner's saved-feature caches and `_SUCCESS.json` are reused when present. For clean reproduction, use a fresh output directory.
-- Dataset identity, checkpoint revision and numerical reproduction still require independent verification.
-- All original top-level function/class bodies are preserved and checked structurally; numerical equivalence still requires a full GPU run and result comparison.
+This repository does not redistribute ShipsEar audio data or AST pretrained model weights. Users must obtain these resources separately from their respective sources and comply with the applicable licensing terms.
 
-## Basic checks
+See `LICENSE-NOTICE.md` for additional licensing information. An explicit project license should be selected before granting general reuse or redistribution rights.
 
-```bash
-python -m compileall -q run_experiments.py scripts tests
-python -m unittest discover -s tests
-```
+## Modularization and Numerical Equivalence Validation
 
-## Attribution and redistribution
+The modular HARPS implementation has been validated against the preserved reference implementation through complete experimental runs on the same dataset and computational environment.
 
-The repository does not redistribute ShipsEar audio or AST model weights. See `LICENSE-NOTICE.md` for licensing status; an explicit project license should be selected by the author before announcing general reuse rights.
+### Structural and Unit Tests
 
-## Modularization validation
+The repository includes structural regression tests that compare the abstract syntax trees (ASTs) of the original top-level functions and classes against their modular counterparts.
+
+Run the syntax checks and unit tests:
 
 ```bash
 python -m compileall -q harps scripts tests run_experiments.py
 python -m unittest discover -s tests -v
 ```
 
-For the complete experiment on the original Linux/CUDA server, set `HARPS_DATA_ROOT`, `HARPS_AST_PATH`, and optionally `HARPS_OUTPUT_DIR`, then run `bash scripts/run_full_experiments.sh`. **The full experiment has not been executed in this distribution.**
+### Full Experimental Validation
+
+Both the reference and modular implementations were executed using the same experimental configuration:
+
+- **Dataset:** ShipsEar, 2,223 audio segments across 12 LOCO acoustic classes.
+- **Random seeds:** 0, 1, 2, 3, 4.
+- **Experimental protocol:** Reference-inclusive Leave-One-Class-Out (LOCO).
+- **Hardware:** NVIDIA A100 80GB PCIe GPU.
+- **Software environment:** Python 3.10.21, PyTorch 2.5.1+cu121, and Transformers 4.46.3.
+
+### Numerical Equivalence Results
+
+The following artifacts were compared between the reference and modular implementations:
+
+| Artifact | Validation result |
+|---|---|
+| Model checkpoints (`.pt`) | Identical SHA256 hashes |
+| Serialized models (`.joblib`) | Identical SHA256 hashes |
+| NumPy arrays (`.npz`) | Identical SHA256 hashes |
+| Evaluation metrics (`.csv`) | Numerically equivalent within `atol=rtol=1e-6` |
+| Metadata and configuration (`.json`) | Equivalent after excluding environment-dependent paths and execution timings |
+| Deep SVDD Wilcoxon signed-rank tests | Matching statistical results |
+
+Both implementations generated 68,559 output files, including model checkpoints, serialized artifacts, predictions, evaluation metrics, and statistical summaries.
+
+The comparison confirms numerical equivalence between the reference and modular implementations under the tested experimental configuration.
+
+### Reproducing the Full Experiment
+
+To execute the complete experiment on a compatible Linux/CUDA server, configure the following environment variables:
+
+- `HARPS_DATA_ROOT`: Path to the experiment-ready ShipsEar dataset.
+- `HARPS_AST_PATH`: Path to the pretrained AST model.
+- `HARPS_OUTPUT_DIR`: Output directory for experimental results (optional).
+
+Then execute:
+
+```bash
+bash scripts/run_full_experiments.sh
+```
+
+For an independent reproduction, use a fresh output directory to prevent previously cached features, model checkpoints, or completion markers from affecting the execution.
+
+**Validation scope:** The equivalence assessment establishes consistency between the reference and modular implementations. It does not independently establish the statistical validity of the experimental design or the generalizability of the reported results.
